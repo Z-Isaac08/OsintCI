@@ -136,14 +136,14 @@ python main.py scan --help
 ## 📤 Output Example
 
 ```bash
-$ python main.py scan +2250585456593
+$ python main.py scan +2250708234519
 ```
 
 ```
 ╭─────────────────╮
 │ ✓ Scan Complete │
 ╰─────────────────╯
-  Number       +2250585456593
+  Number       +2250708234519
   Valid        ✅ Yes
   Carrier      MTN CI
   Line Type    Mobile
@@ -157,17 +157,17 @@ $ python main.py scan +2250585456593
 ```json
 {
   "timestamp": "2026-01-15T14:32:10.123456",
-  "number": "+2250585456593",
+  "number": "+2250708234519",
   "validation": {
     "valid": true,
-    "e164": "+2250585456593",
-    "international": "+225 05 85 45 65 93",
+    "e164": "+2250708234519",
+    "international": "+225 07 08 23 45 19",
     "carrier": "MTN CI",
     "region": "Côte d'Ivoire",
     "number_type": "Mobile"
   },
   "carrier": {
-    "prefix": "05",
+    "prefix": "07",
     "operator": "MTN CI",
     "line_type": "Mobile",
     "portability_note": "Ce préfixe indique l'opérateur d'origine, pas forcément l'opérateur actuel."
@@ -185,17 +185,17 @@ $ python main.py scan +2250585456593
     "whatsapp": {
       "checked": true,
       "found": "unknown",
-      "link": "https://wa.me/2250585456593"
+      "link": "https://wa.me/2250708234519"
     },
     "telegram": {
       "checked": true,
       "found": "unknown",
-      "link": "https://t.me/+2250585456593"
+      "link": "https://t.me/+2250708234519"
     }
   },
   "email_discovery": {
     "email_discovery": {
-      "dork": "\"0585456593\" \"@gmail.com\" OR \"@yahoo.fr\" OR \"@outlook.com\"",
+      "dork": "\"0708234519\" \"@gmail.com\" OR \"@yahoo.fr\" OR \"@outlook.com\"",
       "url": "https://www.google.com/search?q=..."
     }
   }
