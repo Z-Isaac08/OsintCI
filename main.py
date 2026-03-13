@@ -12,6 +12,7 @@ from modules.validator import analyze_number
 from modules.carrier import get_carrier
 from modules.social_checker import check_all
 from modules.spam_checker import check_spam
+from modules.email_checker import generate_email_dorks, analyze_email
 
 app = typer.Typer(help="OSINT Tool for Ivoirian Phone Numbers (+225)")
 console = Console()
@@ -105,6 +106,46 @@ def social(number: str):
         console.print(table)
 
 @app.command()
+def email(target: str):
+    """Analyze an email address or discover emails linked to a phone number."""
+    show_banner()
+    if "@" in target:
+        # Standalone email analysis
+        with console.status(f"[bold green]Analyzing email: {target}..."):
+            result = analyze_email(target)
+
+        if "error" in result:
+            rprint(f"[bold red]Error:[/bold red] {result['error']}")
+            return
+
+        rprint(Panel(f"Email OSINT: [bold cyan]{target}[/bold cyan]", expand=False))
+        for key, info in result["dorks"].items():
+            table = Table(show_header=True, header_style="bold blue")
+            table.add_column(key.replace("_", " ").capitalize(), style="yellow")
+            table.add_column("Value")
+            for k, v in info.items():
+                table.add_row(k, str(v))
+            console.print(table)
+    else:
+        # Discover emails linked to phone
+        v_result = analyze_number(target)
+        if not v_result.get("valid"):
+            rprint("[bold red]Invalid phone number for email discovery.[/bold red]")
+            return
+
+        with console.status(f"[bold green]Discovering emails for: {target}..."):
+            result = generate_email_dorks(str(v_result["national_number"]))
+
+        rprint(Panel(f"Email Discovery Dorks for [bold cyan]{target}[/bold cyan]", expand=False))
+        for key, info in result.items():
+            table = Table(show_header=True, header_style="bold blue")
+            table.add_column(key.replace("_", " ").capitalize(), style="yellow")
+            table.add_column("Value")
+            for k, v in info.items():
+                table.add_row(k, str(v))
+            console.print(table)
+
+@app.command()
 def scan(number: str, export: bool = typer.Option(False, "--export", help="Export results to JSON")):
     """Full OSINT scan on a phone number."""
     show_banner()
@@ -138,6 +179,11 @@ def scan(number: str, export: bool = typer.Option(False, "--export", help="Expor
         soc_res = check_all(v_res["e164"], str(v_res["national_number"]))
         results["social"] = soc_res
 
+    # 5. Email Discovery
+    with console.status("[bold green]Email Discovery..."):
+        e_res = generate_email_dorks(str(v_res["national_number"]))
+        results["email_discovery"] = e_res
+
     # Display Summary
     rprint(Panel("[bold green]Scan Complete[/bold green]", expand=False))
 
@@ -147,6 +193,7 @@ def scan(number: str, export: bool = typer.Option(False, "--export", help="Expor
     summary_table.add_row("[cyan]Carrier:[/cyan]", c_res.get("operator", "Unknown"))
     summary_table.add_row("[cyan]Line Type:[/cyan]", c_res.get("line_type", "Unknown"))
     summary_table.add_row("[cyan]Risk Level:[/cyan]", s_res.get("risk_level", "Unknown"))
+    summary_table.add_row("[cyan]Email Dorks:[/cyan]", f"{len(e_res)} generated")
     console.print(summary_table)
 
     if export:
