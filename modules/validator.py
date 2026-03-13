@@ -25,6 +25,8 @@ def analyze_number(raw_number: str):
 
         if clean_number.startswith("00225"):
             clean_number = "+" + clean_number[2:]
+        elif not clean_number.startswith("+") and len(clean_number) == 10:
+            clean_number = "+225" + clean_number
 
         parsed_number = phonenumbers.parse(clean_number, "CI")
 
