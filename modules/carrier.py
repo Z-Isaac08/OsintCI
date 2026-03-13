@@ -1,3 +1,7 @@
+# Plan national de numérotation à 10 chiffres (PNN10) en Côte d'Ivoire (depuis le 31 janvier 2021)
+# Mobile: 01 (Moov), 05 (MTN), 07 (Orange)
+# Fixe: 21 (Moov), 25 (MTN), 27 (Orange)
+
 OPERATORS = {
     "01": {"operator": "Moov Africa", "line_type": "Mobile"},
     "05": {"operator": "MTN CI", "line_type": "Mobile"},
@@ -24,15 +28,21 @@ FIXE_REGIONS = {
 
 
 def get_carrier(number: str):
-    # Nettoyage basique
-    clean_number = number.replace("+225", "")
-    if len(clean_number) < 2:
-        return {"error": "Numéro trop court pour déterminer le préfixe."}
+    # Nettoyage
+    clean_number = number.replace("+225", "").replace(" ", "").replace("-", "")
+
+    # Gestion du format local à 10 chiffres
+    if len(clean_number) == 10:
+        pass
+    elif len(clean_number) == 8:
+        return {"error": "Ancien format à 8 chiffres détecté. Veuillez utiliser le nouveau format à 10 chiffres (+225 XX XX XX XX XX)."}
+    elif len(clean_number) < 10:
+        return {"error": "Numéro trop court pour la Côte d'Ivoire (10 chiffres requis)."}
 
     head_digits = clean_number[0:2]
     operator_info = OPERATORS.get(head_digits)
     if not operator_info:
-        return {"error": "Préfixe inconnu pour la Côte d'Ivoire."}
+        return {"error": f"Préfixe '{head_digits}' inconnu pour le plan à 10 chiffres de la Côte d'Ivoire."}
 
     line_type = operator_info.get("line_type", "Inconnu")
     operator_name = operator_info.get("operator", "Inconnu")
@@ -45,7 +55,8 @@ def get_carrier(number: str):
         "prefix": head_digits,
         "operator": operator_name,
         "line_type": line_type,
-        "portability_note": "Ce préfixe indique l'opérateur d'origine, pas forcément l'opérateur actuel.",
+        "plan": "PNN 10 chiffres (Post-2021)",
+        "portability_note": "Ce préfixe indique l'opérateur d'origine. La portabilité peut changer l'opérateur réel.",
     }
 
     if region:
